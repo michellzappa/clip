@@ -13,7 +13,8 @@ extension SettingsWindowController {
             )),
             SettingsPage("About", symbol: "info.circle", controller: AboutPage(
                 appName: "Strata",
-                tagline: "Layers of what you copied, newest on top."
+                tagline: "Layers of what you copied, newest on top.",
+                links: [("GitHub", URL(string: "https://github.com/michellzappa/strata")!)]
             ))
         ])
     }
