@@ -21,10 +21,23 @@ list. The menu bar item lists the last ten for the mouse. Text only.
 ./scripts/build-app.sh      # → /Applications/Strata.app, signed, icon regenerated
 ```
 
-Needs `xcodegen` and `../housekit` (icon + menu bar plate + launch-at-login).
+Needs `xcodegen` and the sibling [`../housekit`](../housekit) package, which
+supplies the menu bar plate, the app icon, the settings window chrome and
+launch-at-login — the pieces Strata shares with Tessellate and Cargo. To work
+in Xcode instead: `xcodegen generate && open Strata.xcodeproj`.
+
 Signing uses the stable Apple Development identity from `project.yml` for the
 same reason Tessellate does: TCC ties the Accessibility grant to the code
-signature, and an ad-hoc build loses it on every rebuild.
+signature, and an ad-hoc build loses it on every rebuild. Set your own
+`DEVELOPMENT_TEAM` first.
+
+### Downloadable releases
+
+Push a tag matching `CFBundleShortVersionString` (e.g. `v0.1.0`) to run
+`.github/workflows/release.yml`: universal build, Developer ID signature,
+notarization, a ZIP plus `SHA256SUMS` on the GitHub Release. Same secrets as
+Tessellate's workflow (`APPLE_TEAM_ID`, the Developer ID certificate, an App
+Store Connect API key).
 
 ## Privacy
 
@@ -37,7 +50,16 @@ signature, and an ad-hoc build loses it on every rebuild.
 
 `strata://show` opens the picker, `strata://settings` the settings window.
 
+## Configuration
+
+Settings lives in the menu bar item (⌘,): **History** (shortcut, how many
+to keep, how many in the menu, ignored apps) · **General** (launch at login,
+menu bar icon, Accessibility status) · **About**.
+
 ## Architecture
+
+AppKit throughout, no dependencies beyond `HouseKit`; the shortcut picker is
+the one SwiftUI view, hosted, shared with Tessellate.
 
 | | |
 | --- | --- |
@@ -46,4 +68,5 @@ signature, and an ad-hoc build loses it on every rebuild.
 | `Picker/PickerPanel` | Non-activating floating `NSPanel`, so the target app keeps focus |
 | `Hotkeys/*` | Carbon `RegisterEventHotKey`; `ShortcutDisplay` / `ShortcutRecorder` are Tessellate's, verbatim |
 | `Storage/ClippingStore` | Newest-first, de-duplicated, capped; JSON file + `UserDefaults` settings |
-| `Settings/*` | SwiftUI grouped form in an `NSWindow` |
+| `Settings/HistoryPage` | Strata's page in the HouseKit settings window, next to the shared General and About pages |
+| `App/StrataApp` | `NSStatusItem` and its menu — header, recent clippings, then the house tail (Settings, Launch at Login, Quit) |

@@ -18,7 +18,8 @@ cd "$here"
 xcodegen generate --quiet
 build="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
 xcodebuild -project Strata.xcodeproj -scheme Strata -configuration "$config" \
-  -derivedDataPath build/DerivedData CURRENT_PROJECT_VERSION="$build" -quiet build
+  -derivedDataPath build/DerivedData CURRENT_PROJECT_VERSION="$build" \
+  CODE_SIGNING_ALLOWED=NO -quiet build
 app="build/DerivedData/Build/Products/$config/Strata.app"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $build" "$app/Contents/Info.plist"
 codesign --force --sign "Apple Development" --entitlements Strata/Resources/Strata.entitlements --options runtime "$app"
