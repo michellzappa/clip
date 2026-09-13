@@ -1,6 +1,5 @@
 import AppKit
 import HouseKit
-import SwiftUI
 
 /// Strata's own settings page: the shortcut, how much to keep, what to ignore.
 @MainActor
@@ -20,12 +19,12 @@ final class HistoryPage: SettingsForm, NSTableViewDataSource, NSTableViewDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         section("Shortcut")
-        // Tessellate's SwiftUI picker, hosted; the only SwiftUI left in the app.
-        let picker = NSHostingView(rootView: ShortcutPicker(binding: Binding(
-            get: { [store] in store.settings.hotkey },
-            set: { [store] value in store.update { settings in settings.hotkey = value } }
-        )))
-        row("Show history", picker)
+        let recorder = ShortcutRecorder(binding: store.settings.hotkey) { [store] value in
+            store.update { settings in settings.hotkey = value }
+        }
+        recorder.requiresModifiers = true
+        recorder.placeholder = "Record"
+        row("Show history", recorder)
         note("Press it again while the list is open to step down. ⏎ pastes, ⎋ closes, ⌫ on an empty search forgets the selected item.")
 
         section("History")

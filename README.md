@@ -58,15 +58,14 @@ menu bar icon, Accessibility status) · **About**.
 
 ## Architecture
 
-AppKit throughout, no dependencies beyond `HouseKit`; the shortcut picker is
-the one SwiftUI view, hosted, shared with Tessellate.
+AppKit throughout, no SwiftUI, no dependencies beyond `HouseKit`.
 
 | | |
 | --- | --- |
 | `Clipboard/PasteboardWatcher` | Polls `changeCount` every 300 ms — there is no notification API |
 | `Clipboard/Paster` | Writes the pasteboard, then a `CGEvent` ⌘V if Accessibility allows |
 | `Picker/PickerPanel` | Non-activating floating `NSPanel`, so the target app keeps focus |
-| `Hotkeys/*` | Carbon `RegisterEventHotKey`; `ShortcutDisplay` / `ShortcutRecorder` are Tessellate's, verbatim |
+| `HouseKit.GlobalHotkey` / `ShortcutRecorder` | Carbon `RegisterEventHotKey` and the shortcut control, shared with Tessellate |
 | `Storage/ClippingStore` | Newest-first, de-duplicated, capped; JSON file + `UserDefaults` settings |
 | `Settings/HistoryPage` | Strata's page in the HouseKit settings window, next to the shared General and About pages |
 | `App/StrataApp` | `NSStatusItem` and its menu — header, recent clippings, then the house tail (Settings, Launch at Login, Quit) |

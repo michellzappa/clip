@@ -7,7 +7,7 @@ import HouseKit
 final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let store = ClippingStore()
     private lazy var watcher = PasteboardWatcher(store: store)
-    private let hotkeys = HotkeyManager()
+    private let hotkey = GlobalHotkey(signature: "STRA")
     private lazy var panel = PickerPanel(store: store) { [weak self] clipping in self?.paste(clipping) }
     private lazy var settingsWindowController = SettingsWindowController.strata(store: store)
     private var statusItem: NSStatusItem!
@@ -38,8 +38,7 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem.menu = statusMenu
         rebuildStatusMenu()
 
-        hotkeys.onActivation = { [weak self] in self?.activate() }
-        hotkeys.start()
+        hotkey.onPress = { [weak self] in self?.activate() }
         applySettings(store.settings)
         store.$settings
             .dropFirst()
@@ -72,7 +71,7 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func applySettings(_ settings: StrataSettings) {
-        hotkeys.register(settings.hotkey)
+        hotkey.register(settings.hotkey)
         statusItem.isVisible = settings.showMenuBarIcon
         if LaunchAtLogin.isEnabled != settings.launchAtLogin {
             do {
@@ -142,8 +141,8 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         let showItem = NSMenuItem(title: "Show History…", action: #selector(showPicker(_:)), keyEquivalent: "")
-        if let hotkey = store.settings.hotkey {
-            showItem.title = "Show History… \(ShortcutDisplay.string(for: hotkey))"
+        if let binding = store.settings.hotkey {
+            showItem.title = "Show History… \(binding.displayString)"
         }
         statusMenu.addItem(showItem)
         let clearItem = NSMenuItem(title: "Clear History", action: #selector(clearHistory(_:)), keyEquivalent: "")

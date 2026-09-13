@@ -1,9 +1,10 @@
 import Carbon.HIToolbox
 import Foundation
+import HouseKit
 
 struct StrataSettings: Codable, Equatable, Sendable {
     /// ⇧⌘V, what Flycut used. Quit Flycut before running Strata or they fight over it.
-    var hotkey: CommandBinding? = CommandBinding(keyCode: UInt16(kVK_ANSI_V), modifiers: UInt(cmdKey | shiftKey))
+    var hotkey: KeyBinding? = KeyBinding(keyCode: UInt16(kVK_ANSI_V), modifiers: UInt(cmdKey | shiftKey))
     var historyLimit: Int = 100
     var menuItemCount: Int = 10
     var menuItemLength: Int = 48
