@@ -96,10 +96,10 @@ final class ClipAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.dismiss()
         store.promote(clipping)
         watcher.changeCountToSkip = Paster.place(clipping.text)
-        guard Paster.isTrusted() else {
+        guard Accessibility.isTrusted else {
             if !promptedForAccessibility {
                 promptedForAccessibility = true
-                Paster.requestTrust()
+                Accessibility.requestTrust()
             }
             return
         }

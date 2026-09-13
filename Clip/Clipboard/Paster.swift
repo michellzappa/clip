@@ -1,27 +1,12 @@
 import AppKit
-import ApplicationServices
 import Carbon.HIToolbox
+import HouseKit
 
 /// Puts a clipping on the pasteboard and, with Accessibility granted, sends ⌘V
 /// to the frontmost app. Without the grant it stops at the pasteboard — the
 /// user pastes by hand and the app tells them why once.
 @MainActor
 enum Paster {
-    static func isTrusted() -> Bool {
-        AXIsProcessTrusted()
-    }
-
-    static func requestTrust() {
-        let options = ["AXTrustedCheckOptionPrompt" as CFString: true] as CFDictionary
-        AXIsProcessTrustedWithOptions(options)
-    }
-
-    static func openAccessibilitySettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-            NSWorkspace.shared.open(url)
-        }
-    }
-
     /// Writes `text` to the pasteboard and returns the resulting change count so
     /// the watcher can ignore it.
     @discardableResult
