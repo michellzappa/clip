@@ -24,6 +24,10 @@ final class PickerPanel: NSPanel, NSTableViewDataSource, NSTableViewDelegate, NS
         )
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
+        // Transient picker: ⎋ or clicking away closes it, so no traffic lights.
+        for button in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
+            standardWindowButton(button)?.isHidden = true
+        }
         isMovableByWindowBackground = true
         level = .floating
         hidesOnDeactivate = false
@@ -264,7 +268,7 @@ private final class ClippingRowView: NSTableCellView {
         parts.append(Self.relative.localizedString(for: clipping.copiedAt, relativeTo: .now))
         let lines = clipping.lineCount
         if lines > 1 { parts.append("\(lines) lines") }
-        parts.append("\(clipping.text.count) chars")
+        parts.append("\(clipping.characterCount) chars")
         detail.stringValue = parts.joined(separator: " · ")
     }
 

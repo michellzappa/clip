@@ -28,7 +28,12 @@ struct Clipping: Codable, Equatable, Identifiable, Sendable {
         return String(collapsed.prefix(maxLength)).trimmingCharacters(in: .whitespaces) + "…"
     }
 
+    /// Without surrounding whitespace — a trailing newline is not a second line.
+    var trimmed: Substring { text[...].trimmingCharacters(in: .whitespacesAndNewlines)[...] }
+
     var lineCount: Int {
-        text.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline).count
+        trimmed.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline).count
     }
+
+    var characterCount: Int { trimmed.count }
 }
