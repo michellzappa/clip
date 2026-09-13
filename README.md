@@ -1,4 +1,4 @@
-# Strata
+# Clip
 
 A minimal native macOS menu-bar clipboard history. Layers of what you copied,
 newest on top.
@@ -10,21 +10,21 @@ list. The menu bar item lists the last ten for the mouse. Text only.
 ## Requirements
 
 - macOS 14 (Sonoma) or later
-- Accessibility permission, for Strata to send ⌘V on your behalf. Without it
+- Accessibility permission, for Clip to send ⌘V on your behalf. Without it
   the pick still lands on the pasteboard and you paste yourself.
 - Quit Flycut (or any other app bound to ⇧⌘V) — Carbon lets only one process
-  own a hotkey and Strata will log the failure rather than fight.
+  own a hotkey and Clip will log the failure rather than fight.
 
 ## Build
 
 ```sh
-./scripts/build-app.sh      # → /Applications/Strata.app, signed, icon regenerated
+./scripts/build-app.sh      # → /Applications/Clip.app, signed, icon regenerated
 ```
 
 Needs `xcodegen` and the sibling [`../housekit`](../housekit) package, which
 supplies the menu bar plate, the app icon, the settings window chrome and
-launch-at-login — the pieces Strata shares with Tessellate and Cargo. To work
-in Xcode instead: `xcodegen generate && open Strata.xcodeproj`.
+launch-at-login — the pieces Clip shares with Tessellate and Cargo. To work
+in Xcode instead: `xcodegen generate && open Clip.xcodeproj`.
 
 Signing uses the stable Apple Development identity from `project.yml` for the
 same reason Tessellate does: TCC ties the Accessibility grant to the code
@@ -44,11 +44,11 @@ Store Connect API key).
 - Copies marked `org.nspasteboard.ConcealedType` / `TransientType` (what
   password managers set) are never recorded.
 - Apps in the ignore list (1Password and Keychain Access by default) are skipped.
-- History lives in `~/Library/Application Support/Strata/clippings.json`, local only.
+- History lives in `~/Library/Application Support/Clip/clippings.json`, local only.
 
 ## URL scheme
 
-`strata://show` opens the picker, `strata://settings` the settings window.
+`clip://show` opens the picker, `clip://settings` the settings window.
 
 ## Configuration
 
@@ -67,5 +67,5 @@ AppKit throughout, no SwiftUI, no dependencies beyond `HouseKit`.
 | `Picker/PickerPanel` | Non-activating floating `NSPanel`, so the target app keeps focus |
 | `HouseKit.GlobalHotkey` / `ShortcutRecorder` | Carbon `RegisterEventHotKey` and the shortcut control, shared with Tessellate |
 | `Storage/ClippingStore` | Newest-first, de-duplicated, capped; JSON file + `UserDefaults` settings |
-| `Settings/HistoryPage` | Strata's page in the HouseKit settings window, next to the shared General and About pages |
-| `App/StrataApp` | `NSStatusItem` and its menu — header, recent clippings, then the house tail (Settings, Launch at Login, Quit) |
+| `Settings/HistoryPage` | Clip's page in the HouseKit settings window, next to the shared General and About pages |
+| `App/ClipApp` | `NSStatusItem` and its menu — header, recent clippings, then the house tail (Settings, Launch at Login, Quit) |

@@ -46,7 +46,7 @@ jobs:
       - name: Validate tag and app version
         shell: bash
         run: |
-          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Strata/Resources/Info.plist)
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Clip/Resources/Info.plist)
           tag_version="${GITHUB_REF_NAME#v}"
           if [[ "$version" != "$tag_version" ]]; then
             echo "Tag $GITHUB_REF_NAME does not match CFBundleShortVersionString $version"
@@ -58,7 +58,7 @@ jobs:
         shell: bash
         run: |
           certificate_path="$RUNNER_TEMP/developer-id.p12"
-          keychain_path="$RUNNER_TEMP/strata-build.keychain-db"
+          keychain_path="$RUNNER_TEMP/clip-build.keychain-db"
           keychain_password=$(openssl rand -hex 20)
 
           echo "$APPLE_DEVELOPER_CERTIFICATE_P12_BASE64" | base64 --decode > "$certificate_path"
@@ -78,11 +78,11 @@ jobs:
         shell: bash
         run: |
           xcodebuild \
-            -project Strata.xcodeproj \
-            -scheme Strata \
+            -project Clip.xcodeproj \
+            -scheme Clip \
             -configuration Release \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-            -archivePath "$RUNNER_TEMP/Strata.xcarchive" \
+            -archivePath "$RUNNER_TEMP/Clip.xcarchive" \
             ARCHS="arm64 x86_64" \
             ONLY_ACTIVE_ARCH=NO \
             CODE_SIGN_STYLE=Manual \
@@ -93,14 +93,14 @@ jobs:
       - name: Verify app signature
         shell: bash
         run: |
-          app_path="$RUNNER_TEMP/Strata.xcarchive/Products/Applications/Strata.app"
+          app_path="$RUNNER_TEMP/Clip.xcarchive/Products/Applications/Clip.app"
           codesign --verify --deep --strict --verbose=2 "$app_path"
 
       - name: Submit app for notarization
         shell: bash
         run: |
-          app_path="$RUNNER_TEMP/Strata.xcarchive/Products/Applications/Strata.app"
-          unsigned_zip="$RUNNER_TEMP/Strata-$APP_VERSION-notarization.zip"
+          app_path="$RUNNER_TEMP/Clip.xcarchive/Products/Applications/Clip.app"
+          unsigned_zip="$RUNNER_TEMP/Clip-$APP_VERSION-notarization.zip"
           api_key_path="$RUNNER_TEMP/AuthKey_$APPLE_API_KEY_ID.p8"
 
           ditto -c -k --sequesterRsrc --keepParent "$app_path" "$unsigned_zip"
@@ -114,16 +114,16 @@ jobs:
       - name: Staple notarization ticket
         shell: bash
         run: |
-          app_path="$RUNNER_TEMP/Strata.xcarchive/Products/Applications/Strata.app"
+          app_path="$RUNNER_TEMP/Clip.xcarchive/Products/Applications/Clip.app"
           xcrun stapler staple "$app_path"
           xcrun stapler validate "$app_path"
 
       - name: Package release assets
         shell: bash
         run: |
-          app_path="$RUNNER_TEMP/Strata.xcarchive/Products/Applications/Strata.app"
+          app_path="$RUNNER_TEMP/Clip.xcarchive/Products/Applications/Clip.app"
           release_dir="$RUNNER_TEMP/release"
-          zip_path="$release_dir/Strata-$APP_VERSION.zip"
+          zip_path="$release_dir/Clip-$APP_VERSION.zip"
           checksums_path="$release_dir/SHA256SUMS"
 
           mkdir -p "$release_dir"
@@ -135,7 +135,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            "$RUNNER_TEMP/release/Strata-$APP_VERSION.zip" \
+            "$RUNNER_TEMP/release/Clip-$APP_VERSION.zip" \
             "$RUNNER_TEMP/release/SHA256SUMS" \
-            --title "Strata $APP_VERSION" \
+            --title "Clip $APP_VERSION" \
             --generate-notes

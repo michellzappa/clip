@@ -8,7 +8,7 @@ import Foundation
 @MainActor
 final class ClippingStore: ObservableObject {
     @Published private(set) var clippings: [Clipping] = []
-    @Published var settings: StrataSettings {
+    @Published var settings: ClipSettings {
         didSet {
             guard settings != oldValue else { return }
             settings.save()
@@ -20,10 +20,10 @@ final class ClippingStore: ObservableObject {
     private var saveWorkItem: DispatchWorkItem?
 
     init(directory: URL? = nil) {
-        settings = StrataSettings.load()
+        settings = ClipSettings.load()
         let base = directory ?? FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Strata", isDirectory: true)
+            .appendingPathComponent("Clip", isDirectory: true)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
         fileURL = base.appendingPathComponent("clippings.json")
         if let data = try? Data(contentsOf: fileURL),
@@ -62,7 +62,7 @@ final class ClippingStore: ObservableObject {
         scheduleSave()
     }
 
-    func update(_ block: (inout StrataSettings) -> Void) {
+    func update(_ block: (inout ClipSettings) -> Void) {
         var next = settings
         block(&next)
         settings = next
@@ -90,7 +90,7 @@ final class ClippingStore: ObservableObject {
             let data = try Self.encoder.encode(clippings)
             try data.write(to: fileURL, options: .atomic)
         } catch {
-            NSLog("Strata: save failed: \(error)")
+            NSLog("Clip: save failed: \(error)")
         }
     }
 

@@ -1,7 +1,7 @@
 import AppKit
 import HouseKit
 
-/// Strata's own settings page: the shortcut, how much to keep, what to ignore.
+/// Clip's own settings page: the shortcut, how much to keep, what to ignore.
 @MainActor
 final class HistoryPage: SettingsForm, NSTableViewDataSource, NSTableViewDelegate {
     private let store: ClippingStore

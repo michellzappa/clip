@@ -4,12 +4,12 @@ import HouseKit
 
 @main
 @MainActor
-final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
+final class ClipAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let store = ClippingStore()
     private lazy var watcher = PasteboardWatcher(store: store)
-    private let hotkey = GlobalHotkey(signature: "STRA")
+    private let hotkey = GlobalHotkey(signature: "CLIP")
     private lazy var panel = PickerPanel(store: store) { [weak self] clipping in self?.paste(clipping) }
-    private lazy var settingsWindowController = SettingsWindowController.strata(store: store)
+    private lazy var settingsWindowController = SettingsWindowController.clip(store: store)
     private var statusItem: NSStatusItem!
     private var statusMenu: NSMenu!
     private var cancellables = Set<AnyCancellable>()
@@ -17,7 +17,7 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     static func main() {
         let application = NSApplication.shared
-        let delegate = StrataAppDelegate()
+        let delegate = ClipAppDelegate()
         application.delegate = delegate
         application.run()
     }
@@ -28,10 +28,10 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            button.image = MenuBarPlate.image(glyph: HouseGlyphs.strata)
+            button.image = MenuBarPlate.image(glyph: HouseGlyphs.clip)
             button.imagePosition = .imageOnly
-            button.setAccessibilityLabel("Strata menu")
-            button.toolTip = "Strata"
+            button.setAccessibilityLabel("Clip menu")
+            button.toolTip = "Clip"
         }
         statusMenu = NSMenu()
         statusMenu.delegate = self
@@ -53,10 +53,10 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         store.saveNow()
     }
 
-    /// `strata://show` opens the picker, `strata://settings` the settings window —
+    /// `clip://show` opens the picker, `clip://settings` the settings window —
     /// for Shortcuts, Raycast, and the like.
     func application(_ application: NSApplication, open urls: [URL]) {
-        for url in urls where url.scheme == "strata" {
+        for url in urls where url.scheme == "clip" {
             switch url.host ?? url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")) {
             case "show": panel.present()
             case "settings": settingsWindowController.show()
@@ -70,14 +70,14 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return true
     }
 
-    private func applySettings(_ settings: StrataSettings) {
+    private func applySettings(_ settings: ClipSettings) {
         hotkey.register(settings.hotkey)
         statusItem.isVisible = settings.showMenuBarIcon
         if LaunchAtLogin.isEnabled != settings.launchAtLogin {
             do {
                 try LaunchAtLogin.setEnabled(settings.launchAtLogin)
             } catch {
-                NSLog("Strata: launch at login failed: \(error)")
+                NSLog("Clip: launch at login failed: \(error)")
             }
         }
     }
@@ -121,7 +121,7 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func rebuildStatusMenu() {
         statusMenu.removeAllItems()
         let count = store.clippings.count
-        let header = count == 0 ? "Strata" : "\(count) clipping\(count == 1 ? "" : "s")"
+        let header = count == 0 ? "Clip" : "\(count) clipping\(count == 1 ? "" : "s")"
         statusMenu.addItem(StatusMenu.sectionHeader(header))
 
         let recent = store.clippings.prefix(max(0, store.settings.menuItemCount))
@@ -151,7 +151,7 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusMenu.items.forEach { $0.target = self }
         StatusMenu.appendStandardTail(
             to: statusMenu,
-            appName: "Strata",
+            appName: "Clip",
             target: self,
             settings: #selector(showSettings(_:)),
             launchAtLogin: #selector(toggleLaunchAtLogin(_:)),
@@ -162,13 +162,13 @@ final class StrataAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func makeMainMenu() -> NSMenu {
         let mainMenu = NSMenu()
-        let appMenu = NSMenu(title: "Strata")
-        appMenu.addItem(withTitle: "About Strata", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        let appMenu = NSMenu(title: "Clip")
+        appMenu.addItem(withTitle: "About Clip", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: "Settings…", action: #selector(showSettings(_:)), keyEquivalent: ",").target = self
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Quit Strata", action: #selector(quit(_:)), keyEquivalent: "q").target = self
-        mainMenu.addItem(withTitle: "Strata", action: nil, keyEquivalent: "").submenu = appMenu
+        appMenu.addItem(withTitle: "Quit Clip", action: #selector(quit(_:)), keyEquivalent: "q").target = self
+        mainMenu.addItem(withTitle: "Clip", action: nil, keyEquivalent: "").submenu = appMenu
 
         // Text fields in Settings need these to respond to ⌘C/⌘V/⌘A.
         let editMenu = NSMenu(title: "Edit")
