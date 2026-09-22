@@ -28,7 +28,7 @@ final class ClipAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            button.image = MenuBarPlate.image(glyph: HouseGlyphs.clip)
+            button.image = MenuBarPlate.image(glyph: HouseGlyphs.clipMenuBar)
             button.imagePosition = .imageOnly
             button.setAccessibilityLabel("Clip menu")
             button.toolTip = "Clip"
