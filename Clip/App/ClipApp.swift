@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import HouseKit
+import HouseKitSparkle
 
 @main
 @MainActor
@@ -10,6 +11,8 @@ final class ClipAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let hotkey = GlobalHotkey(signature: "CLIP")
     private lazy var panel = PickerPanel(store: store) { [weak self] clipping in self?.paste(clipping) }
     private lazy var settingsWindowController = SettingsWindowController.clip(store: store)
+    /// Sparkle. Feed and key come from Info.plist (housekit docs/releasing.md).
+    private let updates = SparkleUpdater(appName: "Clip")
     private var statusItem: NSStatusItem!
     private var statusMenu: NSMenu!
     private var cancellables = Set<AnyCancellable>()
@@ -156,7 +159,8 @@ final class ClipAppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             settings: #selector(showSettings(_:)),
             launchAtLogin: #selector(toggleLaunchAtLogin(_:)),
             launchAtLoginEnabled: store.settings.launchAtLogin,
-            quit: #selector(quit(_:))
+            quit: #selector(quit(_:)),
+            updates: updates
         )
     }
 
